@@ -24,7 +24,7 @@ interface Site {
   description: string;
 }
 
-export const loader = async ({ context }: LoaderFunctionArgs) => {
+export const loader = async ({ request, context }: LoaderFunctionArgs) => {
   const env = context.env as Env;
   const userId = await getUserId(request, env); // This will redirect if not logged in
 
