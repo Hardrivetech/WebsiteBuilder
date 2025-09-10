@@ -1,0 +1,17 @@
+name = "website-builder-saas"
+main = "./build/index.js"
+compatibility_date = "2023-10-30"
+
+[vars]
+APP_URL = "http://localhost:8788"
+SUPABASE_URL = "<YOUR_SUPABASE_URL>"
+SUPABASE_ANON_KEY = "<YOUR_SUPABASE_ANON_KEY>"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "website-builder-db"
+database_id = "<YOUR_DATABASE_ID>" # Replace with your D1 DB ID after creation
+
+[[migrations]]
+tag = "v1"
+new_classes = ["D1_binding"]
