@@ -1,24 +1,26 @@
 {
-  "name": "websitebuilder-7qa",
+  "name": "micro-saas-sitebuilder",
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev",
-    "build": "next build",
-    "start": "next start",
-    "lint": "next lint"
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "pages:dev": "wrangler pages dev ./dist --compatibility-date=2024-12-01",
+    "pages:deploy": "wrangler pages deploy ./dist"
   },
   "dependencies": {
-    "next": "14.2.3",
-    "react": "^18",
-    "react-dom": "^18",
-    "@supabase/ssr": "^0.3.0",
-    "@supabase/supabase-js": "^2.43.4"
+    "@supabase/supabase-js": "^2.45.4",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "zod": "^3.23.8"
   },
   "devDependencies": {
-    "typescript": "^5",
-    "@types/node": "^20",
-    "@types/react": "^18",
-    "@types/react-dom": "^18"
+    "@types/react": "^18.3.3",
+    "@types/react-dom": "^18.3.0",
+    "typescript": "^5.5.4",
+    "vite": "^5.4.0",
+    "@vitejs/plugin-react": "^4.3.1",
+    "wrangler": "^3.75.0"
   }
 }

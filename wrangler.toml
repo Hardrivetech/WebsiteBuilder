@@ -1,0 +1,12 @@
+name = "micro-saas-sitebuilder"
+compatibility_date = "2024-12-01"
+
+[vars]
+# Set ROOT_DOMAIN to your apex domain to enable subdomain routing
+# Example: ROOT_DOMAIN = "mysaas.com"
+ROOT_DOMAIN = ""
+SUPABASE_URL = ""
+SUPABASE_ANON_KEY = ""
+
+[site]
+bucket = "dist"
