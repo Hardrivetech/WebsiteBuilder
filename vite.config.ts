@@ -3,9 +3,9 @@ import { cloudflareDevProxyVitePlugin } from "@remix-run/cloudflare";
 import { defineConfig } from "vite";
 import tsconfigPaths from "vite-tsconfig-paths";
 
-export default defineConfig({
+export default defineConfig(({ mode }) => ({
   plugins: [
-    cloudflareDevProxyVitePlugin(),
+    mode === "development" && cloudflareDevProxyVitePlugin(),
     remix({
       future: {
         v3_fetcherPersist: true,
@@ -15,4 +15,4 @@ export default defineConfig({
     }),
     tsconfigPaths(),
   ],
-});
+}));
