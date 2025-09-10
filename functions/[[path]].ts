@@ -33,12 +33,34 @@ export const onRequestGet: PagesFunction = async (context) => {
   if (!slug) return context.next();
 
   const supabase = createClient(env.SUPABASE_URL, env.SUPABASE_ANON_KEY);
-  const { data, error } = await supabase
+  const { data: row, error } = await supabase
     .from("sites")
     .select("data")
     .eq("slug", slug)
     .single();
-  if (error || !data) return new Response("Site not found", { status: 404 });
+  if (error || !row) return new Response("Site not found", { status: 404 });
+
+  // Coerce and validate site data to avoid runtime errors
+  const siteData: any = (row as any).data || {};
+  const safeData = {
+    title: siteData.title ?? "Untitled",
+    tagline: siteData.tagline ?? "",
+    features: Array.isArray(siteData.features)
+      ? siteData.features
+      : typeof siteData.features === "string"
+      ? siteData.features
+          .split(",")
+          .map((f: string) => f.trim())
+          .filter(Boolean)
+      : [],
+    cta: siteData.cta ?? "Get Started",
+    theme: {
+      primary: siteData.theme?.primary ?? "#0ea5e9",
+      bg: siteData.theme?.bg ?? "#ffffff",
+      text: siteData.theme?.text ?? "#111827",
+    },
+    template: siteData.template ?? "landing",
+  };
 
   // Basic analytics: log a view event (non-blocking)
   context.waitUntil(
@@ -51,14 +73,18 @@ export const onRequestGet: PagesFunction = async (context) => {
     })()
   );
 
-  const tpl = data.data?.template || "landing";
-  const element =
-    tpl === "simple"
-      ? React.createElement(SimpleTemplate as any, { data: data.data })
-      : React.createElement(LandingTemplate as any, { data: data.data });
+  try {
+    const tpl = safeData.template === "simple" ? "simple" : "landing";
+    const element =
+      tpl === "simple"
+        ? React.createElement(SimpleTemplate as any, { data: safeData })
+        : React.createElement(LandingTemplate as any, { data: safeData });
 
-  const html = renderToString(element);
-  return new Response("<!doctype html>" + html, {
-    headers: { "content-type": "text/html; charset=UTF-8" },
-  });
+    const html = renderToString(element);
+    return new Response("<!doctype html>" + html, {
+      headers: { "content-type": "text/html; charset=UTF-8" },
+    });
+  } catch (e: any) {
+    return new Response("Render error", { status: 500 });
+  }
 };

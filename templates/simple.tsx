@@ -1,3 +1,5 @@
+import React from "react";
+
 export function SimpleTemplate({ data }: { data: any }) {
   const theme = data.theme || {
     primary: "#0ea5e9",
