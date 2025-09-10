@@ -15,16 +15,25 @@ export function middleware(req: NextRequest) {
   const url = req.nextUrl;
   const hostname = req.headers.get("host");
 
-  // Use your actual root domain here
-  const rootDomain = "https://websitebuilder-7qa.pages.dev/";
+  // It's better to use an environment variable for the root domain.
+  // The host header does not include the protocol, so we should compare against the bare domain.
+  // NEXT_PUBLIC_ROOT_DOMAIN should be set to 'websitebuilder-7qa.pages.dev' in your Vercel environment variables.
+  const rootDomain =
+    process.env.NEXT_PUBLIC_ROOT_DOMAIN || "websitebuilder-7qa.pages.dev";
+
+  // For local development, you can use localhost.
+  const devHostname = `localhost:3000`;
 
   if (
     hostname &&
     hostname !== rootDomain &&
-    !hostname.endsWith(`.localhost:3000`)
+    hostname !== devHostname &&
+    !hostname.endsWith(`.${devHostname}`) // Handles subdomains on localhost
   ) {
     // Extract the subdomain from the hostname
-    const subdomain = hostname.replace(`.${rootDomain}`, "");
+    const subdomain = hostname
+      .replace(`.${rootDomain}`, "")
+      .replace(`.${devHostname}`, "");
 
     // Rewrite the URL to the /site/[domain] page
     url.pathname = `/site/${subdomain}${url.pathname}`;
