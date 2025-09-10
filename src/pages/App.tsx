@@ -1,9 +1,11 @@
 import React, { useEffect, useState } from "react";
 import { supabase } from "../lib/supabase";
 import { SiteEditor } from "../components/SiteEditor";
+import { AdminAnalytics } from "../components/AdminAnalytics";
 
 export function App() {
   const [session, setSession] = useState<any>(null);
+  const [tab, setTab] = useState<"build" | "analytics">("build");
 
   useEffect(() => {
     supabase.auth
@@ -16,7 +18,7 @@ export function App() {
   }, []);
 
   if (!session) return <AuthView />;
-  return <Dashboard />;
+  return <Dashboard tab={tab} setTab={setTab} />;
 }
 
 function AuthView() {
@@ -77,7 +79,13 @@ function AuthView() {
   );
 }
 
-function Dashboard() {
+function Dashboard({
+  tab,
+  setTab,
+}: {
+  tab: "build" | "analytics";
+  setTab: (t: "build" | "analytics") => void;
+}) {
   return (
     <div
       style={{
@@ -86,8 +94,28 @@ function Dashboard() {
         fontFamily: "Inter, system-ui",
       }}
     >
-      <h1>Site Builder</h1>
-      <SiteEditor />
+      <div style={{ display: "flex", gap: 8, marginBottom: 16 }}>
+        <button onClick={() => setTab("build")} disabled={tab === "build"}>
+          Builder
+        </button>
+        <button
+          onClick={() => setTab("analytics")}
+          disabled={tab === "analytics"}
+        >
+          Analytics
+        </button>
+      </div>
+      {tab === "build" ? (
+        <>
+          <h1>Site Builder</h1>
+          <SiteEditor />
+        </>
+      ) : (
+        <>
+          <h1>Analytics</h1>
+          <AdminAnalytics />
+        </>
+      )}
     </div>
   );
 }

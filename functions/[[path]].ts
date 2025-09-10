@@ -2,6 +2,7 @@ import { createClient } from "@supabase/supabase-js";
 import React from "react";
 import { renderToString } from "react-dom/server";
 import { LandingTemplate } from "../templates/landing";
+import { SimpleTemplate } from "../templates/simple";
 
 // Pages Functions entry — handles subdomain routing like {slug}.yourdomain.com
 // For local dev, path-based fallback /s/{slug} also supported
@@ -39,9 +40,24 @@ export const onRequestGet: PagesFunction = async (context) => {
     .single();
   if (error || !data) return new Response("Site not found", { status: 404 });
 
-  const html = renderToString(
-    React.createElement(LandingTemplate, { data: data.data })
+  // Basic analytics: log a view event (non-blocking)
+  context.waitUntil(
+    (async () => {
+      try {
+        await supabase
+          .from("events")
+          .insert({ type: "view", slug, ts: new Date().toISOString() });
+      } catch {}
+    })()
   );
+
+  const tpl = data.data?.template || "landing";
+  const element =
+    tpl === "simple"
+      ? React.createElement(SimpleTemplate as any, { data: data.data })
+      : React.createElement(LandingTemplate as any, { data: data.data });
+
+  const html = renderToString(element);
   return new Response("<!doctype html>" + html, {
     headers: { "content-type": "text/html; charset=UTF-8" },
   });
